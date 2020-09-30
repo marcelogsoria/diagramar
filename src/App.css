@@ -1,0 +1,24 @@
+.App {
+  font-family: sans-serif;
+  text-align: center;
+}
+.entrada {
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+.asignacion {
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+.salida {
+  border-style: solid;
+  border-color: black;
+  border-width: 1px;
+}
+.contenedor {
+  padding-bottom: 15px;
+}
+
+

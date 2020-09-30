@@ -1,0 +1,26 @@
+.alternativa {  
+    width: 100%;  
+    background: #CCC;  
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+  }  
+    
+  .alternativaVerdadero {  
+    width: 50%;  
+    height: auto;  
+    background: #FCC;  
+    float: left;  
+  }  
+    
+  .alternativaFalso {  
+    width: 50%;  
+    height: auto;  
+    background: #0FA;  
+    float: left;  
+  }  
+  
+  .alternativaClear {  
+    clear: both;  
+  }   
+  

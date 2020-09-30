@@ -1,0 +1,26 @@
+.cicloCondicional {  
+    width: 100%;  
+    background: #ACF;  
+    border-style: solid;
+    border-color: black;
+    border-width: 1px;
+  }  
+    
+  .cicloCondicionalMargenIzquierdo {  
+    width: 5%;  
+    height: auto;  
+    background: #ACF;  
+    float: left;  
+  }  
+    
+  .cicloCondicionalHijos {  
+    width: 95%;  
+    height: auto;  
+    background: yellow;  
+    float: right;  
+  }  
+  
+  .cicloCondicionalClear {  
+    clear: both;  
+  }   
+  
