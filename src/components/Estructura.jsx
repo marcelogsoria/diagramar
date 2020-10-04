@@ -17,7 +17,6 @@ const TiposEstructuras = {
 };
 
 function Estructura(block,idPadre,eventos) {
-  //let a=React.createElement(Alternativa);
 
   if (typeof TiposEstructuras[block.component] !== "undefined") {
     let estructura=React.createElement(TiposEstructuras[block.component], {

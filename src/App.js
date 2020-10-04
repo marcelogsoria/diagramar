@@ -235,11 +235,11 @@ class App extends React.Component {
   render() {
     return <div className="App">
       <h1>Test Diagramar</h1>
-      <span>Seleccionado {this.state.seleccionActual.estructura.component} 
-        (id:{this.state.seleccionActual.estructura.id}) </span>
-      <span>Contenedor:  {this.state.seleccionActual.contenedor? 
-          this.state.seleccionActual.contenedor.component  
-          + " id:"  + this.state.seleccionActual.contenedor.id: "nulo"} </span>
+      <span>Seleccionado {this.state.seleccionActual.component} 
+        (id:{this.state.seleccionActual.id}) </span>
+      <span>Contenedor:  {this.state.estructurasPorId[this.state.seleccionActual.idPadre]? 
+          this.state.estructurasPorId[this.state.seleccionActual.idPadre].component  
+          + " id:"  + this.state.estructurasPorId[this.state.seleccionActual.idPadre].id: "nulo"} </span>
       <button  onClick={this.borrarUnaEstructura}>- 1</button>
       <button  onClick={this.agregarUnaEntrada}>+ Ent</button>
       <button  onClick={this.agregarUnaAlternativa}>+ IF</button>
@@ -414,29 +414,50 @@ class App extends React.Component {
   }*/
 
   borrarUnaEstructura(){
-    if (1===parseInt(this.state.seleccionActual.estructura.id)) {
+    if (1===parseInt(this.state.seleccionActual.id)) {
       console.log('no se puede borrar el contenedor base');
     }
-    else if ("contenedor"===this.state.seleccionActual.estructura.component){
+    else if ("contenedor"===this.state.seleccionActual.component){
       console.log('no se puede borrar un contenedor');
     }
     else {
-      this.state.seleccionActual.contenedor.hijos.splice(
-        this.state.seleccionActual.posicion, 1);
-      
-      let nuevoContenedorBase = {
-          id: "1",
-          component: "contenedor",
-          hijos: this.state.contenedorBase.hijos.slice(),
-      };
-  
-      //para disparar eventos de actualizacion
-      this.setState({contenedorBase:nuevoContenedorBase});
-      this.setState({seleccionActual: {
-        posicion:0,
-        estructura:contenedorBase,
-        contenedor: null}
-      });
+      if(typeof this.state.seleccionActual.idPadre !== "undefined") {
+          let idPadre=this.state.seleccionActual.idPadre;
+          let padre=this.state.estructurasPorId[idPadre]
+          if(typeof padre !== "undefined") {
+            let posicionEnHijos=padre.hijos.findIndex(element=>element.id===this.state.seleccionActual.id);
+            if (posicionEnHijos >=0) {
+              //borra con splice
+              padre.hijos.splice(posicionEnHijos, 1);
+              
+              //actualiza estado
+              let nuevoContenedorBase = {
+                  id: "1",
+                  component: "contenedor",
+                  hijos: this.state.contenedorBase.hijos.slice(),
+              };
+          
+              this.setState({contenedorBase:nuevoContenedorBase});
+              this.setState({seleccionActual: {
+                posicion:0,
+                estructura:contenedorBase,
+                contenedor: null}
+              });
+        
+
+
+            }            
+            else {
+              console.log('No se encontró la estrcuctura en los hijos del padre');
+            }
+          }
+          else {
+            console.log('No se encontró el padre de la estructura');
+          }
+      }
+      else {
+        console.log('No se encontró el id del padre de la estructura');
+      }
 
     }
   }
@@ -445,15 +466,15 @@ class App extends React.Component {
 
     let nuevoHijo=this.asignarNuevaId(nuevaEstructura);
     
-    if ("contenedor"===this.state.seleccionActual.estructura.component){
+    if ("contenedor"===this.state.seleccionActual.component){
       nuevoHijo.idPadre=this.state.seleccionActual.estructura.id;
       this.state.seleccionActual.estructura.hijos.push(nuevoHijo);
     }
     else {
-      nuevoHijo.idPadre=this.state.seleccionActual.contenedor.id;
-      this.state.seleccionActual.contenedor.hijos
-        .splice(this.state.seleccionActual.posicion
-          , 0, nuevoHijo);
+      let padre=this.state.estructurasPorId[this.state.seleccionActual.idPadre];
+      nuevoHijo.idPadre=padre.id;
+      let posicionEnHijos=padre.hijos.findIndex(element=>element.id===this.state.seleccionActual.id);
+      padre.hijos.splice(posicionEnHijos, 0, nuevoHijo);
 
     }
 
@@ -463,8 +484,13 @@ class App extends React.Component {
       hijos: this.state.contenedorBase.hijos.slice(),
     };
 
+    let nuevoArrayEstructurasPorId=this.state.estructurasPorId.slice();
+    nuevoArrayEstructurasPorId[nuevoHijo.id]=nuevoHijo;
     //para disparar eventos de actualizacion
-    this.setState({contenedorBase:nuevoContenedorBase});
+    this.setState(
+      {contenedorBase:nuevoContenedorBase,
+        estructurasPorId:nuevoArrayEstructurasPorId,
+      });
 
   }
 
