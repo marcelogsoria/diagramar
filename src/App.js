@@ -209,14 +209,11 @@ class App extends React.Component {
       id:1,
     }
     let arrayIds=[];
-    this.procesarContenedor(contenedorBase,datosProximaEstructura,arrayIds);
+    this.procesarEstructura(contenedorBase,datosProximaEstructura,arrayIds);
 
     this.state={
       contenedorBase:contenedorBase,
-      seleccionActual: {
-        posicion:0,
-        estructura:contenedorBase,
-        contenedor: null},
+      seleccionActual: contenedorBase,
       estructurasPorId: arrayIds,
       proximoIdAAsignar: datosProximaEstructura.id,
     }
@@ -431,18 +428,14 @@ class App extends React.Component {
               padre.hijos.splice(posicionEnHijos, 1);
               
               //actualiza estado
-              let nuevoContenedorBase = {
-                  id: "1",
-                  component: "contenedor",
-                  hijos: this.state.contenedorBase.hijos.slice(),
-              };
+              // let nuevoContenedorBase = {
+              //     id: "1",
+              //     component: "contenedor",
+              //     hijos: this.state.contenedorBase.hijos.slice(),
+              // };
           
-              this.setState({contenedorBase:nuevoContenedorBase});
-              this.setState({seleccionActual: {
-                posicion:0,
-                estructura:contenedorBase,
-                contenedor: null}
-              });
+              this.setState({contenedorBase:this.state.contenedorBase});
+              this.setState({seleccionActual:this.state.contenedorBase});
         
 
 
@@ -464,32 +457,44 @@ class App extends React.Component {
 
   agregarUnaEstructura(nuevaEstructura) {
 
-    let nuevoHijo=this.asignarNuevaId(nuevaEstructura);
-    
+    let padre=null;
     if ("contenedor"===this.state.seleccionActual.component){
-      nuevoHijo.idPadre=this.state.seleccionActual.estructura.id;
-      this.state.seleccionActual.estructura.hijos.push(nuevoHijo);
+      padre=nuevaEstructura;
+      nuevaEstructura.idPadre=this.state.seleccionActual.id;
+      this.state.seleccionActual.hijos.push(nuevaEstructura);
     }
     else {
-      let padre=this.state.estructurasPorId[this.state.seleccionActual.idPadre];
-      nuevoHijo.idPadre=padre.id;
+      padre=this.state.estructurasPorId[this.state.seleccionActual.idPadre];
+      nuevaEstructura.idPadre=padre.id;
       let posicionEnHijos=padre.hijos.findIndex(element=>element.id===this.state.seleccionActual.id);
-      padre.hijos.splice(posicionEnHijos, 0, nuevoHijo);
+      padre.hijos.splice(posicionEnHijos, 0, nuevaEstructura);
 
     }
 
-    let nuevoContenedorBase = {
-      id: "1",
-      component: "contenedor",
-      hijos: this.state.contenedorBase.hijos.slice(),
-    };
+    // let nuevoContenedorBase = {
+    //   id: "1",
+    //   component: "contenedor",
+    //   hijos: this.state.contenedorBase.hijos.slice(),
+    // };
+
+    let arrayNuevosIds=[];
+
+    let datosProximaEstructura={padre:padre,id:this.state.proximoIdAAsignar};
+    this.procesarEstructura(nuevaEstructura,datosProximaEstructura,arrayNuevosIds);
+
 
     let nuevoArrayEstructurasPorId=this.state.estructurasPorId.slice();
-    nuevoArrayEstructurasPorId[nuevoHijo.id]=nuevoHijo;
+    arrayNuevosIds.forEach((element, index, array) =>{
+      nuevoArrayEstructurasPorId[index]=element;
+      } 
+    );
+
     //para disparar eventos de actualizacion
     this.setState(
-      {contenedorBase:nuevoContenedorBase,
+      {
+        contenedorBase:this.state.contenedorBase,
         estructurasPorId:nuevoArrayEstructurasPorId,
+        proximoIdAAsignar:datosProximaEstructura.id,
       });
 
   }
@@ -578,81 +583,81 @@ class App extends React.Component {
   }
 /**
  * 
- * @param {contenedor} contenedor 
+ * @param {estructura} estructura 
  * @param {Object {padre:  id:}  } datosProximaEstructura 
  */
-  procesarContenedor(contenedor, datosProximaEstructura, arrayIds) {
+  procesarEstructura(estructura, datosProximaEstructura, arrayIds) {
     if (null===datosProximaEstructura.padre) {
-      contenedor.idPadre=0;
+      estructura.idPadre=0;
     }
     else {
-      contenedor.idPadre=datosProximaEstructura.padre.id;
+      estructura.idPadre=datosProximaEstructura.padre.id;
     }
-    contenedor.id=datosProximaEstructura.id;
+    estructura.id=datosProximaEstructura.id;
     datosProximaEstructura.id++;
-    arrayIds[contenedor.id]=contenedor;
-    contenedor.hijos.forEach( (estructura,index) => {
-      switch(estructura.component){
-        case "alternativa":
-          estructura.padre=contenedor.id;
-          estructura.id=datosProximaEstructura.id;
-          arrayIds[estructura.id]=estructura;
-          datosProximaEstructura.id++;
-          
+    arrayIds[estructura.id]=estructura;
+    switch(estructura.component){
+      case "contenedor":
+        estructura.hijos.forEach( (estructuraActual,index) => {
           datosProximaEstructura.padre=estructura;
-          this.procesarContenedor(estructura.hijosVerdadero,datosProximaEstructura, arrayIds);
+          this.procesarEstructura(estructuraActual,datosProximaEstructura,arrayIds);
+        });
+        break;
+      case "alternativa":
+        datosProximaEstructura.padre=estructura;
+        this.procesarEstructura(estructura.hijosVerdadero,datosProximaEstructura, arrayIds);
 
-          datosProximaEstructura.padre=estructura;
-          this.procesarContenedor(estructura.hijosFalso,datosProximaEstructura, arrayIds);
-          
-          break;
-
-        case "asignacion":
-          estructura.padre=contenedor.id;
-          estructura.id=datosProximaEstructura.id;
-          arrayIds[estructura.id]=estructura;
-          datosProximaEstructura.id++;
-          break;
+        datosProximaEstructura.padre=estructura;
+        this.procesarEstructura(estructura.hijosFalso,datosProximaEstructura, arrayIds);
         
-        case "cicloCondicional":
-          estructura.padre=contenedor.id;
-          estructura.id=datosProximaEstructura.id;
-          arrayIds[estructura.id]=estructura;
-          datosProximaEstructura.id++;
-          
-          datosProximaEstructura.padre=estructura;
-          this.procesarContenedor(estructura.hijos,datosProximaEstructura, arrayIds);
-          break;
+        break;
 
-        case "cicloIncondicional":
-          estructura.padre=contenedor.id;
-          estructura.id=datosProximaEstructura.id;
-          arrayIds[estructura.id]=estructura;
-          datosProximaEstructura.id++;
-          
-          datosProximaEstructura.padre=estructura;
-          this.procesarContenedor(estructura.hijos,datosProximaEstructura, arrayIds);
-          break;
+      case "asignacion":
+        // estructuraActual.padre=estructura.id;
+        // estructuraActual.id=datosProximaEstructura.id;
+        // arrayIds[estructuraActual.id]=estructuraActual;
+        // datosProximaEstructura.id++;
+        break;
+      
+      case "cicloCondicional":
+        // estructuraActual.padre=estructura.id;
+        // estructuraActual.id=datosProximaEstructura.id;
+        // arrayIds[estructuraActual.id]=estructuraActual;
+        // datosProximaEstructura.id++;
+        
+        datosProximaEstructura.padre=estructura;
+        this.procesarEstructura(estructura.hijos,datosProximaEstructura, arrayIds);
+        break;
 
-        case "entrada":
-          estructura.padre=contenedor.id;
-          estructura.id=datosProximaEstructura.id;
-          arrayIds[estructura.id]=estructura;
-          datosProximaEstructura.id++;
-          break;
+      case "cicloIncondicional":
+        // estructuraActual.padre=estructura.id;
+        // estructuraActual.id=datosProximaEstructura.id;
+        // arrayIds[estructuraActual.id]=estructuraActual;
+        // datosProximaEstructura.id++;
+        
+        datosProximaEstructura.padre=estructura;
+        this.procesarEstructura(estructura.hijos,datosProximaEstructura, arrayIds);
+        break;
 
-        case "salida":
-          estructura.padre=contenedor.id;
-          estructura.id=datosProximaEstructura.id;
-          arrayIds[estructura.id]=estructura;
-          datosProximaEstructura.id++;
-          break;
+      case "entrada":
+        // estructuraActual.padre=estructura.id;
+        // estructuraActual.id=datosProximaEstructura.id;
+        // arrayIds[estructuraActual.id]=estructuraActual;
+        // datosProximaEstructura.id++;
+        break;
 
-        default:
-          console.log("No se pudo identificar la estructura al procesar el contenedor.", estructura);
-          break;
-        }
-    });
+      case "salida":
+        // estructuraActual.padre=estructura.id;
+        // estructuraActual.id=datosProximaEstructura.id;
+        // arrayIds[estructuraActual.id]=estructuraActual;
+        // datosProximaEstructura.id++;
+        break;
+
+      default:
+        console.log("No se pudo identificar la estructura al procesar el contenedor.", estructura);
+        break;
+      
+    }
 
   }
   
