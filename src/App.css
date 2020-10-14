@@ -1,7 +1,7 @@
-.App {
+body {  
   font-family: sans-serif;
-  text-align: center;
 }
+/*
 .entrada {
   border-style: solid;
   border-color: black;
@@ -17,8 +17,17 @@
   border-color: black;
   border-width: 1px;
 }
+*/
 .contenedor {
   padding-bottom: 15px;
 }
-
-
+/*Este bloque se usa para las estructuras: Entrada, Salida, Asignacion*/
+.bloque {     
+	background-color: #fff;
+	border: 1px solid #000;
+  text-align:center; 
+}
+.expresion {
+  height:25px;	    
+  font-size: 0.875em;
+}
