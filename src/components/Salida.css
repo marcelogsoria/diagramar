@@ -1,0 +1,49 @@
+.salida_izq {
+    width: 0;
+    height: 0;	 
+    margin-top: 7px;
+    border-top: 9px solid transparent;
+    border-right: 9px solid transparent;          
+    border-bottom: 9px solid #000;	 
+    border-left: 9px solid #000;     
+    float: left;
+  }
+  .salida_izq:before {
+    content:'';
+    z-index:1;
+    display:block;
+    width: 0;
+    height: 0;     
+    border-top: 8px solid transparent;
+    border-right: 8px solid transparent;          
+    border-bottom: 8px solid #fff;	 
+    border-left: 8px solid #fff;
+    position:relative;
+    top:-7px;
+    left:-9px;
+  }
+  
+  .salida_der {
+    width: 0;
+    height: 0;	 
+    margin-top: 7px;
+    border-top: 9px solid transparent;
+    border-right: 9px solid #000;          
+    border-bottom: 9px solid #000;	 
+    border-left: 9px solid transparent;     
+    float: right;
+  }
+  .salida_der:before {
+    content:'';
+    z-index:1;
+    display:block;
+    width: 0;
+    height: 0;     
+    border-top: 8px solid transparent;
+    border-right: 8px solid #fff;          
+    border-bottom: 8px solid #fff;	 
+    border-left: 8px solid transparent;
+    position:relative;
+    top:-7px;
+    left:-7px;
+  }
